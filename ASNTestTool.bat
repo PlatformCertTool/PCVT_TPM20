@@ -1,0 +1,1 @@
+PlatCertsNoTPM.bat -ekcca cert.cer -ekc EK.crt -pcca cert.cer -pc cert.cer -crlurl www.tsc.com

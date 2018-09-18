@@ -1,0 +1,37 @@
+
+TPM 2.0 PLATFORM CERTIFICATE VERIFICATION TOOLS INTSALLATION GUIDE
+==================================================================
+
+This file describes Installation instructions for TPM 2.0 version of the Platform Certificate Tools package. 
+
+1. DEPENDENCIES
+This version of the TPM 2.0 Platform Certificate Verification toolset has the following dependencies.
+	
+	1. IBM's TPM 2.0 TSS (https://sourceforge.net/projects/ibmtpm20tss/) (version 1045+)
+	2. OpenSSL 1.0.x
+	3. [optional] IBM's Software TPM 2.0 (https://sourceforge.net/projects/ibmswtpm2/) (version 974+) 
+	4. Java JVM 1.7 or greater
+	5. Ability to run Linux Bash script
+
+	
+2. BUILDING ‘C’ EXECUTABLES
+There are two ‘C’ executables used in this package.  These two executables will have to be built and linked into the same directory the tools shell scripts are run in.
+
+	1. To build the two required executable files, getAndVerifyEK, and getAndVerifyEK2, follow the instructions in their respective readme.txt files. The readme file are found in the following two directories (relative to the toolset installation directory), ./src/c/getAndVerifyEK, and ./src/c/getAndVerifyEK2.
+
+	2. Once those executable files are built link them into the installation directory for this toolset.
+
+		# cd <toolset installation dir>.
+		# ln -s ./src/c/getAndVerifyEK/getAndVerifyEK .
+		# ln -s ./src/c/getAndVerifyEK2/getAndVerifyEK2 .
+	
+	3. Link IBM TSS libraries to current directory.
+		
+		# ln -s <path to ibmtss>/ibmtss1045/utils/libtss.so* .
+	
+3. Shell Scripts
+The shell scripts have to be designated as executable files.
+
+	1. Excute the following command from the command line
+		
+		# chmod +x *.sh

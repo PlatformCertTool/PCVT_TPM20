@@ -1,0 +1,204 @@
+
+TPM 2.0 PLATFORM CERTIFICATE VERIFICATION TOOLS
+===============================================
+
+This file describes typical use cases for this TPM 2.0 version of the Platform Certificate Tools package. 
+
+The first three use cases indicate how the tools may be used together in a manufacturing setting to obtain the EK Certificate from the platform, create the Platform Certificate, and then verify the binding between the two certificates. It will also generate XML files containing the information in the platform certificate to more easily access information about the certificates.
+
+The fourth use case shows how the tools may be used out in the field to verify that the Endorsement Key (EK) Certificate and the Platform Certificate match.
+
+1. GET EK CERTIFICATE, VERIFY EK AND VERIFY EK CERTIFICATE SIGNATURE
+
+	This tool will get the EK Certificate and public key (from TPM or input file), verify against the CA certificate and make sure the EK matches the EK in the TPM	
+
+	* Inputs:
+		o EK Certificate CA Certificate
+		o (OPTIONAL) EK Certificate
+		o (OPTIONAL) EK Cert Index Indicator (1=RSA, 2=ECC, Default 1)
+		o (OPTIONAL) EK Verification Method (1= Make/Activate Credential, 2= Sorted session, Default 2)
+		o (OPTIONAL) TPM owner password (Default is NULL)
+		o (OPTIONAL) TPM endorsement password (Default is NULL)
+		
+	* Outputs
+		o Notification of EK cert signature verification success or failure
+		o Notification of TPM EK is valid
+		o (OPTIONAL) Notification of input EK matching TPM EK (If EK cert was input)
+		o (OPTIONAL) EK Certificate PEM formatted file
+		o (OPTIONAL) EK Certificate XML representation file
+		
+	* Actions
+		o If no input EK Cert: Get the EK Cert from TPM NV
+		o If input EK Cert: Load EK Cert (PEM)
+		o Verify the EK Cert against the input CA Certificate Chain
+		o Verify EK (Sorted session, or Make/Activate Credential)
+		o If input EK Cert: Compare the EK in the Cert with the EK in the TPM 
+		o If output EK: Output the EK in PEM and XML formats
+
+	Usage:
+
+	verifyEKinTPM.sh  -ekcca <filename> [-ekc <filename>] [-ekcout <filename>] [-ekcxmlout <filename>] [-ekindex <1 | 2> ] [-ekmethod <1 | 2>] [-ownerpw <password>] [-endpw <password>] [-v]
+	
+	
+	-ekcca <filename> 		where the file contains a list of certificate files included in the EK certificate signing chain
+	-ekc <filename> 		where the file contains the EK certificate
+	-ekcout <filename>		where filename is the name of the output EK Cert PEM file
+	-ekcxmlout <filename>	where filename is the name of the output EK Cert XML-formatted file
+	-ekindex <1 | 2> 		
+							The built-in EK certificate “index” indicating which EK certificate in the NV to use, RSA, or ECC. 1 for RSA and 2 for ECC. This is not a required option.  If not included on the command line, the code will attempt to use RSA and if not found will use ECC.
+	
+	-ekmethod <1 | 2> 		
+							Indicates which method will be used for TPM validation. In method 1 a make credential and activate credential are performed, while in method 2 a salted session is used. This is not a required option. If not included on the command line, method 2 will be used.
+	
+	-ownerpw <password> 	TPM owner auth (password). This is not a required option. If not included on the command line, null will be used.
+	-endpw <password> 		
+							TPM endorsement auth (password). This is not a required option. If not included on the command line, null will be used.
+	-v						verbose mode
+
+
+	Example:
+
+		./verifyEKinTPM.sh -ekcca ./sampleFiles/CAchainRSA.txt -ekc ./sampleFiles/sample_ekcert.pem -ekcxmlout ./temp_EK_cert.xml	
+
+	
+2. GENERATE PLATFORM CERTIFICATE FROM XML FILES
+
+	Use human readable/editable files to generate a valid platform certificate. The platform certificate will be signed with an input private key. The input XML files are intended to be combination of files output by the tools run in other scenarios and user edited files. 
+	
+	* Inputs:
+		o (OPTIONAL) XML file containing EK Certificate information – issuer and issuer serial number
+		o (OPTIONAL) XML file containing fields of the certificate common across multiple certificates
+		o (OPTIONAL) XML file containing fields of the certificate specific to an individual device or platform (e.g. platform serial #, subjAltName)
+		o Private key (for signing) in PEM (default) or DER format
+		o NOTE: While each XML file input is optional, at least one XML file must be present
+		o NOTE: Together the XML files must contain the minimum information to create a valid Attribute Certificate (Should we require the minimum Platform Certificate information??)
+
+	* Outputs
+		o Platform certificate (signed) in PEM (default) or DER format
+
+	* Actions
+		o Parse and combine the XML files
+		o Produce and sign the certificate with the combined input information
+		o Output the certificate in the requested format
+
+	Usage:
+
+	platformCertFromXml.sh  [-xcommon <filename>] [-xek <filename>] [-xplat <filename>] [-privkey <filename>] [-v]
+	
+	-xcommon <filename> XML-formatted file contains the info common across multiple certificates
+	-xek <filename> 	where the XML-formatted file contains the issuer and issuer serial number
+	-xplat <filename>	where the XML-formatted file contains info specific to an individual platform
+	-privkey <filename> where filename is the name of the private signing key
+	-out <filename> 	where filename is the name of the output platform certificate
+	-der	 			if present the output file will be formatted as a DER, otherwise it will be PEM 
+	-v					verbose mode
+
+	Example:
+
+		./platformCertFromXml.sh -out ./temp_plat_cert.pem -xek ./sampleFiles/sample_plat_cert_ek.xml -xcommon ./sampleFiles/sample_plat_cert_common.xml -xplat ./sampleFiles/sample_plat_cert_platform.xml
+
+	
+3. VERIFY EK CERTIFICATE MATCHES PLATFORM CERTIFICATE HOLDER – WITHOUT TPM INTERACTION
+
+	This tool, intended to be used during the manufacturing process, will verify that a Platform Certificate and an EK Certificate match.  More specifically, that the information in the EK matches the information in the Holder field of the Platform Certificate.  Additionally, this tool will verify the signature on the Platform Certificate against the input CA certificate as well as ensuring the input CA certificate has not been revoked by checking against a CRL downloaded from the input CRL URL.
+
+	Note that this tool…
+
+		* Use files output by the tools run in other scenarios.
+		* Runs without any TPM interaction
+		* Could find a matching platform certificate as explicit input or in a folder of platform certificates
+
+	* Inputs:
+		o EK Certificate CA Certificate
+		o EK Certificate
+		o Platform Certificate Signing CA Certificate
+		o One of…
+			* (OPTIONAL) Platform Certificate or
+			* (OPTIONAL) Directory of Platform Certificates
+		o CRL URL
+
+	* Outputs
+		o Notification of verification success or failure
+		o (OPTIONAL) Platform Certificate XML representation file
+		o (OPTIONAL) EK Certificate XML representation file
+
+	* Actions
+		o Verify the EK Cert against the input EK CA Public Key Chain
+		o Verify the Platform Certificate Signing Certificate has not been revoked
+		o If Platform Cert directory, repeat following steps until a match is found or checked all files in the directory. Otherwise, check against input Platform Certificate
+			* Compare the EK Cert serial number and Platform Cert Holder serial number
+			* Verify the Platform Cert against the input Platform Cert Signing Public Key Chain
+
+	Usage:
+
+	verifyEKandPlatCertsNoTPM.sh  -ekcca<filename> -ekc <filename> [-ekcxmlout <filename>] -pcca <filename> [-pc <filename>] [-pcd <directory>] -crlurl <URL> [-pcxmlout <filename>] [-v]
+	
+	-ekcca <filename> 		where the file contains a list of certificate files included in the EK certificate signing chain
+	-ekc <filename> 		where the file contains the EK certificate
+	-ekcxmlout <filename> 	where filename is the name of the output EK Cert XML-formatted file
+	-pcca <filename> 		where the file contains the platform certificate CA certificate
+	-pc <filename> 			where the file contains the Platform certificate
+	-crlurl <URL> 			where URL is the URL to where the CRL can be downloaded
+	-pcxmlout <filename> 	where filename is the name of the output Platform Cert XML-formatted file
+	-v						verbose mode
+
+	
+	Example:
+	
+		./verifyEKandPlatCertsNoTPM.sh -ekcca ./sampleFiles/CAchainRSA.txt -ekc ./sampleFiles/sample_ekcert.pem -pcca platform_ca_cert_file -crlurl https://some_url -pc ./sampleFiles/sample_plat_cert.cer -pcxmlout ./temp_plat_cert.xml  
+
+	
+4. VERIFY EK CERTIFICATE MATCHES PLATFORM CERTIFICATE HOLDER – WITH TPM INTERACTION
+
+	This tool, intended to be used in the field after platform delivery to a customer, will verify that a Platform Certificate and an EK Certificate match.  Specifically, the information in the EK matches the information in the Holder field of the Platform Certificate. The EK certificate will be fetched from the NV of the local TPM. Additionally, this tool will verify the signature on the Platform Certificate against the input CA certificate as well as ensuring the input CA certificate has not been revoked by checking against a CRL downloaded from the input CRL URL.
+	
+	Note that this tool…
+		* Use files output by the tools run in other scenarios.
+		* Must be able to fetch the EK certificate from the local TPM’s NV.
+		* Could find a matching platform certificate as explicit input or in a folder of platform certificates.
+
+* Inputs:
+	o EK Certificate CA Certificate
+	o Platform Certificate Signing CA
+	o One of…
+		* (OPTIONAL) Platform Certificate or
+		* (OPTIONAL) Directory of Platform Certificates
+	o (OPTIONAL) EK Cert Index Indicator (1=RSA, 2=ECC, Default 1)
+	o (OPTIONAL) TPM endorsement password (Default is NULL)
+	o CRL URL
+	
+* Outputs
+	o Notification of verification success or failure
+	o (OPTIONAL) Platform Certificate XML representation file
+	o (OPTIONAL) EK Certificate PEM formatted file
+	o (OPTIONAL) EK Certificate XML representation file
+	
+* Actions
+	o Fetch EK Cert from TPM NV – find the correct certificate based Template 
+	o Verify the EK Cert against the input EK CA Public Key Chain 
+	o Compare the EK in the Cert with the EK in the TPM 
+	o Verify the Platform Certificate Signing Certificate has not been revoked
+	o If Platform Cert directory, repeat following steps until a match is found or checked all files in the directory. Otherwise, check against input Platform Certificate
+		* Verify the Platform Cert against the input Platform Cert Signing Public Key Chain
+		* Compare the EK Cert serial number and Platform Cert Holder serial number
+		
+	Usage:
+	
+	verifyEKandPlatCertsWithTPM.sh  -ekcca <filename> [-ekc <filename>] [-ekcout <filename>] [-ekcxmlout <filename>] -pcca <filename> [-pc <filename>] [-pcd <directory>] -crlurl <URL> [-endpw <password>] [-pcxmlout <filename>] [-v]
+  
+	-ekcca <filename> 		where the file contains a list of certificate files included in the EK certificate signing chain
+	-ekc <filename> 		where the file contains the EK certificate
+	-ekcout <filename>		where filename is the name of the output EK Cert PEM file
+	-ekcxmlout <filename> 	where filename is the name of the output EK Cert XML-formatted file
+	-pcca <filename> 		where the file contains the signing public key chain of platform certificate
+	-pc <filename> 			where the file contains the Platform certificate
+	-crlurl <URL> 			where URL is the URL to where the CRL can be downloaded
+	-endpw <password> 		
+							TPM endorsement auth (password). This is not a required option. If not included on the command line, null will be used.
+	-pcxmlout <filename> 	where filename is the name of the output Platform Cert XML-formatted file
+	-v						verbose mode
+
+
+	Example:
+
+		./verifyEKandPlatCertsWithTPM.sh -ekcca ./sampleFiles/CAchainRSA.txt -ekc ./sampleFiles/sample_ekcert.pem -pcca platform_ca_cert_file -crlurl https://some_url -pc ./sampleFiles/sample_plat_cert.cer -pcxmlout ./temp_plat_cert.xml  
