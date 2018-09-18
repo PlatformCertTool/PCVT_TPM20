@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PlatformCertificateData xmlns="www.trustiphi.com/platfromcertificateparser" ver="0">
+    <EKCertSerialNumber>1e1c0d14</EKCertSerialNumber>
+    <EKIssuer>C=DE,O=Infineon Technologies AG,OU=OPTIGA(TM) TPM2.0,CN=Infineon OPTIGA(TM) RSA Manufacturing CA 003</EKIssuer>
+</PlatformCertificateData>

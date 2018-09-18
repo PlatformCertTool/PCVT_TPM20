@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PlatformCertificateData xmlns="www.trustiphi.com/platfromcertificateparser" ver="0">
+    <ValidTo>2020-08-20T11:53:44.000-04:00</ValidTo>
+    <MajorVersion>2</MajorVersion>
+    <MinorVersion>0</MinorVersion>
+    <Revision>43</Revision>
+    <ValidFrom>2017-08-20T11:53:44.000-04:00</ValidFrom>
+    <PlatformClass>0x00000001</PlatformClass>
+    <Issuer>C=US,ST=CA,L=Santa Clara,O=Intel Corporation,OU=Platform Attribute Certificate Issuer,CN=www.intel.com</Issuer>
+    <CertificatePolicies>
+        <policyIdentifier>1.2.840.113741.1.5.2.4</policyIdentifier>
+        <policyQualifier>
+            <policyQualifierId>1.3.6.1.5.5.7.2.1</policyQualifierId>
+            <qualifier>https://www.intel.com/platcertcps.pdf</qualifier>
+        </policyQualifier>
+        <policyQualifier>
+            <policyQualifierId>1.3.6.1.5.5.7.2.2</policyQualifierId>
+            <qualifier>TCG Trusted Platform Endorsement</qualifier>
+        </policyQualifier>
+    </CertificatePolicies>
+    <AuthorityKeyIdentifier>9993D439CB32E2AB95F737A3B777291CD4A439B6</AuthorityKeyIdentifier>
+    <AuthorityAccessMethod>1.3.6.1.5.5.7.48.1</AuthorityAccessMethod>
+    <AuthorityAccessLocation>
+        <tag>uniformResourceIdentifier</tag>
+        <name>https://www.intel.com/ocsp</name>
+    </AuthorityAccessLocation>
+    <SignatureAlgorithm>SHA256WITHRSA</SignatureAlgorithm>
+    <PlatformAssertionsVersion>0</PlatformAssertionsVersion>
+    <PlatformAssertionsCCInfo>
+        <version>3.1</version>
+        <assurancelevel>7</assurancelevel>
+        <evaluationStatus>2</evaluationStatus>
+        <plus>false</plus>
+        <strengthOfFunction>1</strengthOfFunction>
+        <profileOid>1.2.3.4.5.6</profileOid>
+        <profileUri>
+            <uniformResourceIdentifier>https://www.intel.com/protectionprofile.pdf</uniformResourceIdentifier>
+        </profileUri>
+        <targetOid>1.2.3.4.5.7</targetOid>
+        <targetUri>
+            <uniformResourceIdentifier>https://www.intel.com/cctarget.pdf</uniformResourceIdentifier>
+        </targetUri>
+    </PlatformAssertionsCCInfo>
+    <PlatformAssertionsFipsLevelVersion>140-2</PlatformAssertionsFipsLevelVersion>
+    <PlatformAssertionsFipsLevel>4</PlatformAssertionsFipsLevel>
+    <PlatformAssertionsFipsLevelPlus>false</PlatformAssertionsFipsLevelPlus>
+    <PlatformAssertionsRtmType>3</PlatformAssertionsRtmType>
+    <PlatformAssertionsIso9000Certified>false</PlatformAssertionsIso9000Certified>
+    <PlatformAssertionsIso9000Uri>https://www.intel.com/isocertification.pdf</PlatformAssertionsIso9000Uri>
+    <TcgCredentialSpecificationMajorVersion>1</TcgCredentialSpecificationMajorVersion>
+    <TcgCredentialSpecificationMinorVersion>0</TcgCredentialSpecificationMinorVersion>
+    <TcgCredentialSpecificationRevision>11</TcgCredentialSpecificationRevision>
+    <PlatformConfigUri>
+        <uniformResourceIdentifier>https://www.intel.com/PCRs.xml</uniformResourceIdentifier>
+    </PlatformConfigUri>
+</PlatformCertificateData>
