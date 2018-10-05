@@ -16,7 +16,7 @@
 #
 # Initial Development by TrustPhi, LLC, www.trusiphi.com
 
-TARGET = ../getAndVerifyEK2
+TARGET = ../getAndVerifyEK
 INCLUDES = -I../
 LIBS = -L../ -ltss -lcrypto
 CC = gcc
