@@ -1,0 +1,179 @@
+int main(int argc, char* argv[])
+{
+    TPM_RC rc = 0;
+    TPM_RC rc1 = 0;
+    int	i; /* argc iterator */
+    TSS_CONTEXT  *tssContext = NULL;
+    /* EK cert index */
+    TPMI_RH_NV_INDEX ekCertIndex = EK_CERT_RSA_INDEX;   /* default rsa */
+    /* EK validation method: 1: make/activate credential; 2: salted session */
+    int ekmethod = 2;
+    /* CA cert filename*/
+    const char *ekcacert = NULL;
+    /* EK cert filename */
+    const char* ekc = NULL;
+    /* output EK cert PEM file */
+    const char* ekout = NULL;
+    /* Owner auth */
+    const char * ownerPw = NULL;
+    /* Endorsement auth */
+    const char* endorsementPw = NULL;
+    /* EK handle */
+    TPM_HANDLE ekKeyHandle = 0;
+    /* EK public */
+    TPMT_PUBLIC ekPub;
+
+    /* command line argument defaults */
+    for (i = 1; (i < argc) && (rc == 0); i++) {
+        if (strcmp(argv[i], "-ekcacert") == 0) {
+            i++;
+            if (i < argc) {
+                ekcacert = argv[i];
+            }
+            else {
+                printf("Missing parameter for -ekcacert\n");
+                printUsage();
+            }
+        }
+        else if (strcmp(argv[i], "-ekc") == 0) {
+            i++;
+            if (i < argc) {
+                ekc = argv[i];
+            }
+            else {
+                printf("Missing parameter for -ekc\n");
+                printUsage();
+            }
+        }
+        else if (strcmp(argv[i], "-ekout") == 0) {
+            i++;
+            if (i < argc) {
+                ekout = argv[i];
+            }
+            else {
+                printf("Missing parameter for -ekout\n");
+                printUsage();
+            }
+        }
+        else if (strcmp(argv[i], "-ekindex") == 0) {
+            i++;
+            if (i < argc) {
+                if (strcmp(argv[i], "1") == 0) {
+                    ekCertIndex = EK_CERT_RSA_INDEX;
+                }
+                else if (strcmp(argv[i], "2") == 0)
+                {
+                    ekCertIndex = EK_CERT_EC_INDEX;
+                }
+                else {
+                    printf("-ekindex is not valid\n");
+                    printUsage();
+                }
+            }
+            else {
+                printf("Missing parameter for -ekindex\n");
+                printUsage();
+            }
+        }
+        else if (strcmp(argv[i], "-ekmethod") == 0) {
+            i++;
+            if (i < argc) {
+                if (strcmp(argv[i], "1") == 0)
+                {
+                    ekmethod = 1;
+                }
+                else if (strcmp(argv[i], "2") == 0) {
+                    ekmethod = 2;
+                }
+                else {
+                    printf("-ekmethod is not valid\n");
+                    printUsage();
+                }
+            }
+            else {
+                printf("Missing parameter for -ekmethod\n");
+                printUsage();
+            }
+        }
+        else if (strcmp(argv[i], "-endorsementpw") == 0) {
+            i++;
+            if (i < argc) {
+                endorsementPw = argv[i];
+            }
+            else {
+                printf("Missing parameter for -endorsementpw\n");
+                printUsage();
+            }
+        }
+        else if (strcmp(argv[i], "-ownerpw") == 0) {
+            i++;
+            if (i < argc) {
+                ownerPw = argv[i];
+            }
+            else {
+                printf("Missing parameter for -ownerpw\n");
+                printUsage();
+            }
+        }
+        else if (strcmp(argv[i], "-v") == 0) {
+            verbose = 1;
+        }
+        else {
+            printf("\n%s is not a valid option\n", argv[i]);
+            printUsage();
+        }
+    }
+
+    if (ekcacert == NULL) {
+        printf("Missing or illegal parameter -ekcacert\n");
+        printUsage();
+    }
+
+    /* start a TSS context */
+    if (rc == 0) {
+        rc = TSS_Create(&tssContext);
+    }
+    /* run in HW TPM */
+    if (rc == 0) {
+        rc = TSS_SetProperty(tssContext, TPM_INTERFACE_TYPE, "dev");
+    }
+    /* validate EK cert */
+    if (rc == 0) {
+        rc1 = validateEkCert(tssContext, &ekCertIndex, ekcacert, ekc, 
+            endorsementPw, ekout, &ekKeyHandle, &ekPub);
+    }   
+    /* validate EK */
+    if (ekmethod == 1) {
+        /* makecredential and activatecredential*/
+        if (verbose) {
+            printf("INFO: Verify EK by make/activate credential\n");
+        }
+        rc = validateEk1(tssContext, ekCertIndex, ownerPw, endorsementPw, 
+            &ekKeyHandle, &ekPub);
+    }
+    else if (ekmethod == 2) {
+        /* salted session */
+        if (verbose) {
+            printf("INFO: Verify EK by salted session\n");
+        }
+        rc = validateEk2(tssContext, ekCertIndex, endorsementPw, &ekKeyHandle);
+    }
+    if (rc == 0)
+    {
+        printf("INFO: EK verification success\n");
+    }
+    /* delete TSS context*/
+    {
+        TPM_RC rc1 = TSS_Delete(tssContext);
+        tssContext = NULL;
+        if (rc == 0) {
+            rc = rc1;
+        }
+    }
+    if (rc == 0 && rc1 != 0)
+    {
+        rc = rc1;
+    }
+
+    return rc;
+}

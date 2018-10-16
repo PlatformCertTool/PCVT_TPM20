@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" targetNamespace="www.trustiphi.com/platfromcertificateparser" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:pcp="www.trustiphi.com/platfromcertificateparser">
+  <xs:element name="PlatformCertificateData">
+    <xs:complexType>
+      <xs:sequence>
+
+
+                <xs:element name="PlatformCertSerialNumber" type="xs:string" minOccurs="0"></xs:element>
+                <xs:element name="EKCertSerialNumber" type="xs:string" minOccurs="0"></xs:element>
+                <xs:element name="EKIssuer" type="xs:string" minOccurs="0"></xs:element>
+                <xs:element name="PlatformManufacturerStr" type="xs:string" minOccurs="0"></xs:element>
+
+                <xs:element name="PlatformModel" type="xs:string" minOccurs="0"></xs:element>
+      	<xs:element name="PlatformVersion" type="xs:string" minOccurs="0"></xs:element>
+                <xs:element name="PlatformManufacturerId" type="xs:string" minOccurs="0" maxOccurs="unbounded"></xs:element>
+                <xs:element name="PlatformSerial" type="xs:string" minOccurs="0"></xs:element>
+                <xs:element name="ValidFrom" type="xs:dateTime" minOccurs="0"></xs:element>
+                <xs:element name="ValidTo" type="xs:dateTime" minOccurs="0"></xs:element>
+                <xs:element name="Issuer" type="xs:string" minOccurs="0"></xs:element>
+                <xs:element name="PlatformClass" minOccurs="0"
+      		maxOccurs="1">
+      		<xs:simpleType>
+      			<xs:restriction base="xs:string">
+
+      				<xs:length value="4"></xs:length>
+      			</xs:restriction>
+      		</xs:simpleType>
+      	</xs:element>
+                <xs:element name="MajorVersion" type="xs:int" minOccurs="0" maxOccurs="1">
+      	</xs:element>
+                <xs:element name="MinorVersion" type="xs:int" minOccurs="0"
+      		maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="Revision" type="xs:int" minOccurs="0"
+      		maxOccurs="1">
+      	</xs:element>
+
+      	<xs:element name="AMT" type="xs:boolean" minOccurs="0"></xs:element>
+
+      	<xs:element name="CertificatePolicies"
+      		type="pcp:XmlCertificatePolicies" minOccurs="0"
+      		maxOccurs="unbounded">
+      	</xs:element>
+      	<xs:element name="AuthorityKeyIdentifier" type="xs:hexBinary"
+      		minOccurs="0" maxOccurs="1">
+      	</xs:element>
+                <xs:element name="AuthorityAccessMethod" type="xs:string"
+      		minOccurs="0" maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="AuthorityAccessLocation"
+      		type="pcp:XmlGeneralName" minOccurs="0" maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="CRLDistributionPoints"
+      		type="pcp:XmlCRLDistributionPoints" minOccurs="0"
+      		maxOccurs="unbounded">
+      	</xs:element>
+
+      	<xs:element name="PlatformAssertionsVersion" type="xs:int"
+      		minOccurs="0" maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="PlatformAssertionsCCInfo"
+      		type="pcp:XmlCommonCriteriaMeasures" minOccurs="0"
+      		maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="PlatformAssertionsFipsLevelVersion"
+      		type="xs:string" minOccurs="0" maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="PlatformAssertionsFipsLevel" type="xs:int"
+      		minOccurs="0" maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="PlatformAssertionsFipsLevelPlus"
+      		type="xs:boolean" minOccurs="0" maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="PlatformAssertionsRtmType" type="xs:int"
+      		minOccurs="0" maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="PlatformAssertionsIso9000Certified"
+      		type="xs:boolean" minOccurs="0" maxOccurs="1">
+      	</xs:element>
+
+      	<xs:element name="PlatformAssertionsIso9000Uri"
+      		type="xs:string" minOccurs="0" maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="TcgCredentialSpecificationMajorVersion"
+      		type="xs:int" minOccurs="0" maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="TcgCredentialSpecificationMinorVersion"
+      		type="xs:int" minOccurs="0" maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="TcgCredentialSpecificationRevision"
+      		type="xs:int" minOccurs="0" maxOccurs="1">
+      	</xs:element>
+      	<xs:element name="PlatformConfigUri"
+      		type="pcp:XmlURIReference" minOccurs="0">
+      	</xs:element>
+      	<xs:element name="ComponentIdentifier"
+      		type="pcp:XmlComponentIdentifier" minOccurs="0"
+      		maxOccurs="unbounded">
+      	</xs:element>
+      	<xs:element name="PlatformProperties" type="pcp:XmlProperties"
+      		minOccurs="0" maxOccurs="unbounded">
+      	</xs:element>
+      	<xs:element name="PlatformPropertiesUri"
+      		type="pcp:XmlURIReference" minOccurs="0">
+      	</xs:element>
+                <xs:element name="SignatureAlgorithm" type="xs:string" minOccurs="0"></xs:element>
+                <xs:element name="SignatureValue" type="xs:hexBinary" minOccurs="0"></xs:element>
+            </xs:sequence>
+      <xs:attribute name="ver" type="xs:int" use="required"></xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="XmlCertificatePolicies">
+    <xs:sequence>
+      <xs:element name="policyIdentifier" type="xs:string" />
+      <xs:element name="policyQualifier" type="pcp:XmlPolicyQualifier" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="XmlPolicyQualifier">
+    <xs:sequence>
+      <xs:element name="policyQualifierId" type="xs:string" />
+      <xs:element name="qualifier" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="XmlCRLDistributionPoints">
+    <xs:sequence>
+      <xs:element name="distributionPoint" type="pcp:XmlDistributionPointName" minOccurs="0" maxOccurs="1" />
+      <xs:element name="reasons" type="xs:string" minOccurs="0" maxOccurs="1" />
+      <xs:element name="cRLIssuer" type="pcp:XmlGeneralName" minOccurs="0" maxOccurs="1" />      
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="XmlDistributionPointName">
+  	<xs:choice>
+  	  <xs:element name="fullname" 
+  	      type="pcp:XmlGeneralName" minOccurs="1" maxOccurs="unbounded" />
+      <xs:element name="nameRelativeToCRLIssuer" 
+          type="pcp:XmlGeneralName" minOccurs="1" maxOccurs="unbounded" />
+  	</xs:choice>
+  </xs:complexType>
+  
+  <xs:complexType name="XmlCommonCriteriaMeasures">
+  	<xs:sequence>
+  		<xs:element name="version" type="xs:string" minOccurs="0" maxOccurs="1">
+
+  		</xs:element>
+  		<xs:element name="assurancelevel" minOccurs="0" maxOccurs="1">
+  			<xs:simpleType>
+  				<xs:restriction base="xs:int">
+
+
+  					<xs:maxInclusive value="7"></xs:maxInclusive>
+  					<xs:minInclusive value="1"></xs:minInclusive>
+  				</xs:restriction>
+  			</xs:simpleType>
+  		</xs:element>
+  		<xs:element name="evaluationStatus" minOccurs="0" maxOccurs="1">
+  			<xs:simpleType>
+  				<xs:restriction base="xs:int">
+
+  					<xs:minInclusive value="0"></xs:minInclusive>
+
+  					<xs:maxInclusive value="2"></xs:maxInclusive>
+  				</xs:restriction>
+  			</xs:simpleType>
+  		</xs:element>
+  		<xs:element name="plus" type="xs:boolean" minOccurs="0" maxOccurs="1"></xs:element>
+  		<xs:element name="strengthOfFunction" minOccurs="0"
+  			maxOccurs="1">
+  			<xs:simpleType>
+  				<xs:restriction base="xs:int">
+
+  					<xs:minInclusive value="0"></xs:minInclusive>
+
+  					<xs:maxInclusive value="2"></xs:maxInclusive>
+  				</xs:restriction>
+  			</xs:simpleType>
+  		</xs:element>
+  		<xs:element name="profileOid" type="xs:string" minOccurs="0"
+  			maxOccurs="1">
+  		</xs:element>
+  		<xs:element name="profileUri" type="pcp:XmlURIReference"
+  			minOccurs="0">
+  		</xs:element>
+  		<xs:element name="targetOid" type="xs:string" minOccurs="0"
+  			maxOccurs="1">
+  		</xs:element>
+  		<xs:element name="targetUri" type="pcp:XmlURIReference" minOccurs="0" maxOccurs="1"></xs:element>
+  	</xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="XmlURIReference">
+  	<xs:sequence>
+  		<xs:element name="uniformResourceIdentifier"
+  			type="xs:string" minOccurs="0" maxOccurs="1">
+  		</xs:element>
+  		<xs:element name="hashAlgorithm" type="xs:string"
+  			minOccurs="0" maxOccurs="1">
+  		</xs:element>
+  		<xs:element name="hashValue" type="xs:hexBinary" minOccurs="0" maxOccurs="1"></xs:element>
+  	</xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="XmlGeneralName">
+  	<xs:sequence>
+  		<xs:element name="tag" type="pcp:XmlGeneralNameTag"></xs:element>
+  		<xs:element name="name" type="xs:string"></xs:element>
+  	</xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="XmlGeneralNameTag">
+  	<xs:restriction base="xs:string">
+  		<xs:enumeration value="otherName"></xs:enumeration>
+  		<xs:enumeration value="rfc822Name"></xs:enumeration>
+  		<xs:enumeration value="dNSName"></xs:enumeration>
+  		<xs:enumeration value="x400Address"></xs:enumeration>
+  		<xs:enumeration value="directoryName"></xs:enumeration>
+  		<xs:enumeration value="ediPartyName"></xs:enumeration>
+  		<xs:enumeration value="uniformResourceIdentifier"></xs:enumeration>
+  		<xs:enumeration value="iPAddress"></xs:enumeration>
+  		<xs:enumeration value="registeredID"></xs:enumeration>
+  	</xs:restriction>
+  </xs:simpleType>
+  
+  <xs:complexType name="XmlComponentIdentifier">
+  	<xs:sequence>
+  		<xs:element name="componentManufacturer" type="xs:string"></xs:element>
+  		<xs:element name="componentModel" type="xs:string"></xs:element>
+  		<xs:element name="componentSerial" 
+  			type="xs:string" minOccurs="0" maxOccurs="1">
+  		</xs:element>
+  		<xs:element name="componentRevision" 
+  			type="xs:string" minOccurs="0" maxOccurs="1">
+  		</xs:element>
+  		<xs:element name="componentManufacturerId" 
+  			type="xs:string" minOccurs="0" maxOccurs="1">
+  		</xs:element>
+  		<xs:element name="fieldReplaceable" 
+  			type="xs:boolean" minOccurs="0" maxOccurs="1">
+  		</xs:element>
+  		<xs:element name="componentAddress" 
+  			type="pcp:XmlComponentAddress" minOccurs="0" maxOccurs="unbounded">
+  		</xs:element>  		
+  	</xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="XmlComponentAddress">
+  	<xs:sequence>
+  		<xs:element name="addressType" type="xs:string"></xs:element>
+  		<xs:element name="addressValue" type="xs:string"></xs:element> 		
+  	</xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="XmlProperties">
+  	<xs:sequence>
+  		<xs:element name="propertyName" type="xs:string"></xs:element>
+  		<xs:element name="propertyValue" type="xs:string"></xs:element> 		
+  	</xs:sequence>
+  </xs:complexType>
+  
+</xs:schema>

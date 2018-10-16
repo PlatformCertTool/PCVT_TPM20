@@ -1,0 +1,182 @@
+int main(int argc, char* argv[])
+{
+    TPM_RC rc = 0;
+    int	i; /* argc iterator */
+    TSS_CONTEXT  *tssContext = NULL;
+    /* EK cert index */
+    TPMI_RH_NV_INDEX ekCertIndex = EK_CERT_RSA_INDEX;   /* default rsa */
+    /* CA cert filename*/
+    const char *ekcacert = NULL;
+    /* EK cert filename */
+    const char* ekc = NULL;
+    /* output EK cert PEM file */
+    const char* ekout = NULL;
+    /* Endorsement auth */
+    const char* endorsementPw = NULL;
+    /* EK handle */
+    TPM_HANDLE ekKeyHandle = 0;
+    /* EK public */
+    TPMT_PUBLIC ekPub;
+
+    /* command line argument defaults */
+    for (i = 1; (i < argc) && (rc == 0); i++) {
+        if (strcmp(argv[i], "-ekcacert") == 0) {
+            i++;
+            if (i < argc) {
+                ekcacert = argv[i];
+            }
+            else {
+                printf("Missing parameter for -ekcacert\n");
+                printUsage();
+            }
+        }
+        else if (strcmp(argv[i], "-ekc") == 0) {
+            i++;
+            if (i < argc) {
+                ekc = argv[i];
+            }
+            else {
+                printf("Missing parameter for -ekc\n");
+                printUsage();
+            }
+        }
+        else if (strcmp(argv[i], "-ekout") == 0) {
+            i++;
+            if (i < argc) {
+                ekout = argv[i];
+            }
+            else {
+                printf("Missing parameter for -ekout\n");
+                printUsage();
+            }
+        }
+        else if (strcmp(argv[i], "-ekindex") == 0) {
+            i++;
+            if (i < argc) {
+                if (strcmp(argv[i], "1") == 0) {
+                    ekCertIndex = EK_CERT_RSA_INDEX;
+                }
+                else if (strcmp(argv[i], "2") == 0)
+                {
+                    ekCertIndex = EK_CERT_EC_INDEX;
+                }
+                else {
+                    printf("-ekindex is not valid\n");
+                    printUsage();
+                }
+            }
+            else {
+                printf("Missing parameter for -ekindex\n");
+                printUsage();
+            }
+        }
+        else if (strcmp(argv[i], "-endorsementpw") == 0) {
+            i++;
+            if (i < argc) {
+                endorsementPw = argv[i];
+            }
+            else {
+                printf("Missing parameter for -endorsementpw\n");
+                printUsage();
+            }
+        }
+        else if (strcmp(argv[i], "-v") == 0) {
+            verbose = 1;
+        }
+        else {
+            printf("\n%s is not a valid option\n", argv[i]);
+            printUsage();
+        }
+    }
+
+    if (ekcacert == NULL) {
+        printf("Missing or illegal parameter -ekcacert\n");
+        printUsage();
+    }
+
+    /* start a TSS context */
+    if (rc == 0) {
+        rc = TSS_Create(&tssContext);
+    }
+    /* run in HW TPM */
+    if (rc == 0) {
+        rc = TSS_SetProperty(tssContext, TPM_INTERFACE_TYPE, "dev");
+    }
+    /* validate EK cert */
+    if (rc == 0) {
+        rc = validateEkCert(tssContext, &ekCertIndex, ekcacert, ekc,
+            endorsementPw, ekout, &ekKeyHandle, &ekPub);
+    }
+    /* flush EK */
+    if (ekKeyHandle != 0) {
+        if (verbose) printf("INFO: Flush EK %08x\n",
+            ekKeyHandle);
+        TPM_RC rc1 = flushContext(tssContext, ekKeyHandle);
+        if (rc == 0) {
+            rc = rc1;
+        }
+    }
+    /* delete TSS context*/
+    {
+        TPM_RC rc1 = TSS_Delete(tssContext);
+        tssContext = NULL;
+        if (rc == 0) {
+            rc = rc1;
+        }
+    }
+
+    return rc;
+}
+
+/* pinrtUsage()
+*/
+static void printUsage()
+{
+    printf("\n");
+    printf("getAndVerifyEK2  -ekcacert <filename> [-ekc <filename>] "
+        "[-ekout <filename>] [-ekindex <1 | 2>] [-endorsementpw <password>] "
+        "[-v]\n");
+    printf("\n");
+    printf("-ekcacert <filename>  where the file contains a list of filenames of CA certificates\n");
+    printf("                      (including the root and intermeidate ones) for the EK certificate\n");
+    printf("-ekc <filename>       where the file contains the EK certificate\n");
+    printf("-ekout <filename>     where filename is the name of the output EK Cert PEM file\n");
+    printf("-ekindex <1 | 2>      The built-in EK certificate \"index\" indicating which EK certificate\n");
+    printf("                      in the NV to use, RSA, or ECC. 1 for RSA and 2 for ECC.\n");
+    printf("                      This is not a required option. If not included on the command line,\n");
+    printf("                      the code will attempt to use RSA and if not found will use ECC.\n");
+    printf("-endorsementpw        password for endorsement auth\n");
+    printf("-v                    verbose mode\n");
+
+    exit(1);
+}
+
+/* ekCertToX509()
+Convert EK cert string to X509 structure.
+@param[in] EK cert binary
+@param[in] EK cert length
+@param[out] EK cert X509 structure
+*/
+static TPM_RC ekCertToX509(unsigned char *ekCertificate,
+    uint16_t ekCertLength,
+    X509 **ekX509Certificate)    /* freed by caller */
+{
+    TPM_RC rc = 0;
+
+    /* unmarshal the EK certificate DER stream to
+    EK certificate X509 structure */
+    if (rc == 0) {
+        /* temp because d2i moves the pointer */
+        //unsigned char *tmpCert = ekCertBin;
+        unsigned char *tmpCert = ekCertificate;
+        *ekX509Certificate = d2i_X509(NULL, /* freed by caller */
+            (const unsigned char **)&tmpCert, ekCertLength);
+        if (*ekX509Certificate == NULL) {
+            printf("ERROR: Could not parse X509 EK certificate\n");
+            rc = ACE_INVALID_CERT;
+        }
+    }
+
+    return rc;
+}
+

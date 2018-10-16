@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PlatformCertificateData xmlns="www.trustiphi.com/platfromcertificateparser" ver="0">
+    <EKCertSerialNumber>37408374</EKCertSerialNumber>
+    <EKIssuer>C=US,ST=CA,L=Santa Clara,O=Intel Corporation,OU=EK Certificate Issuer,CN=www.intel.com</EKIssuer>
+</PlatformCertificateData>

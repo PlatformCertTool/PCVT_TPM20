@@ -1,0 +1,2 @@
+./sampleFiles/OptigaRsaMfrCA022.pem
+./sampleFiles/OptigaRsaRootCA.pem
